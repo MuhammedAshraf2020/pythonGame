@@ -34,24 +34,17 @@ def CreateMatrix(List):
 
 Matrix = CreateMatrix(Places)
 
-def Choice_Random(axis):
-
-    Random1 = np.random.randint(0 , axis)
-    Random2 = np.random.randint(0 , axis)
+def Choice_Random(Random1 , Random2):
+    axisX = [Random1 - 1 , Random1 , Random1+1]
+    axisY = [Random2 - 1 , Random2 , Random2 + 1]
+    Random1 = np.random.choice(axisX)
+    Random2 = np.random.choice(axisY)
     print(Random1 , Random2)
     return Random1 , Random2
 
 def player(X , y , screen):
     screen.blit(SorSar , (X , y))
 
-
-def get_tile_color(till_cons):
-    tile_color = (255 , 255 , 255)
-    if till_cons == "s":
-        tile_color = (220 , 12 , 90 )
-    elif till_cons  == "o":
-        tile_color = (0 , 0 , 0)
-    return tile_color
 
 def draw_graid(surface ):
     Color = (0,150,255)
@@ -62,14 +55,14 @@ def draw_graid(surface ):
         pygame.draw.line(surface , Color , (new_width , 0) , (new_width , Screen_hight) , 2)
 
 def game_loop(screen , axis , block_hight , block_width):
-    matrix  = np.zeros((axis , axis))
-    freq_matrix = np.array(matrix , copy = True)
-    
+
+    matrix  = np.zeros((axis , axis))    
     Sum = 0
     index = 0
     Last_time = axis **2
-    
+    Random1 , Random2 = 2 , 2
     while True:
+        
         index = index + 1
         screen.fill((255 , 255 , 255))
         for event in pygame.event.get():
@@ -78,21 +71,27 @@ def game_loop(screen , axis , block_hight , block_width):
                 sys.exit()
 
         draw_graid(screen)
-        Random1 , Random2 = Choice_Random(axis)
-        x , y = Matrix[Random1][Random2][0] , Matrix[Random1][Random2][1]
+        RandomTemp = (Random1 , Random2)
+        Random1 , Random2 = Choice_Random(Random1 , Random2)
+        if (Random1 not in range(0 , axis) or Random2 not in range(0 , axis)):
+            Random1 , Random2 = RandomTemp[0] , RandomTemp[1]
+            x , y = Matrix[Random1][Random2][0] , Matrix[Random1][Random2][1]
+        else:
+            x , y = Matrix[Random1][Random2][0] , Matrix[Random1][Random2][1]
+        
+        if matrix[Random1][Random2] == 0:
+            Sum = Sum + 1
+            
         matrix[Random1][Random2] +=1
         
-        if freq_matrix[Random1][Random2] == 0:
-            freq_matrix[Random1][Random2] = 1
-            Sum = Sum + 1
         if Sum == Last_time:
             print("Done After {} Step ".format(index))   
-            print(matrix6)
+            print(matrix)
             pygame.quit()
             sys.exit()
         
         player(x , y , screen)
-        time.sleep(0.19)
+        time.sleep(0.25)
         pygame.display.update()
 
 
